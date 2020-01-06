@@ -1,2 +1,2 @@
-# 433_to_MQTT
-Arduino 433 MHz to MQTT
+# 433 to MQTT
+Simple sketch for Arduino 433 MHz reciever to MQTT publisher.
