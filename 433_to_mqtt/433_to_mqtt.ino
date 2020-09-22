@@ -6,8 +6,11 @@
 
 RCSwitch mySwitch = RCSwitch();
 
-// Update these with values suitable for your network.
+// Update these with values suitable for your network
+IPAddress ip(192, 168, 0, 4);
 byte mac[] = {  0xDE, 0xED, 0xBF, 0xFE, 0xFE, 0x7D };
+
+// MQTT broker
 IPAddress server(192, 168, 0, 3);
 
 EthernetClient ethClient;
@@ -36,6 +39,11 @@ void output(unsigned long decimal, unsigned int length, unsigned int protocol) {
 }
 
 void reconnect() {
+  Ethernet.begin(mac, ip);
+  
+  // Allow the hardware to sort itself out
+  delay(1500);
+  
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
@@ -58,11 +66,12 @@ void reconnect() {
 void setup() {
   Serial.begin(115200);
 
-  client.setServer(server, 1883);
-
-  Ethernet.begin(mac);
+  Ethernet.begin(mac, ip);
+  
   // Allow the hardware to sort itself out
   delay(1500);
+
+  client.setServer(server, 1883);
   
   mySwitch.enableReceive(0);  // Receiver on interrupt 0 => that is pin #2
 }
@@ -71,7 +80,9 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
+  
   client.loop();
+  
   if (mySwitch.available()) {
     output(mySwitch.getReceivedValue(), mySwitch.getReceivedBitlength(), mySwitch.getReceivedProtocol());
     mySwitch.resetAvailable();
